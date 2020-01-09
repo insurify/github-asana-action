@@ -1,0 +1,18 @@
+name: 'Asana Git'
+description: 'Asana Github Actions'
+inputs:
+  asana-pat:
+    description: 'Asana Public Access Token.'
+    required: true
+  task-comment:
+    description: 'Provide text, which will add a comment with the pull request link to the asana task.'
+    required: false
+  target-section:
+    description: 'Provide the name of an Asana projects section or column where you want to move the task.'
+    required: false
+  trigger-phrase:
+    description: 'Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'
