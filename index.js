@@ -9,12 +9,11 @@ async function asanaOperations(
   sectionName,
   taskComment
 ) {
-  const client = asana.Client.create({
-    defaultHeaders: { 'asana-enable': 'new-sections,string_ids' },
-    logAsanaChangeWarnings: false
-  }).useAccessToken(asanaPAT);
-
   try {
+    const client = asana.Client.create({
+      defaultHeaders: { 'asana-enable': 'new-sections,string_ids' },
+      logAsanaChangeWarnings: false
+    }).useAccessToken(asanaPAT);
     if (sectionName) {
       let project = await client.sections.findByProject(projectId);
       if (project) {
@@ -36,7 +35,7 @@ async function asanaOperations(
       core.info('Added the pull request link to the Asana task.');
     }
   } catch (ex) {
-    core.error(ex.value);
+    console.error(ex.value);
   }
 }
 
@@ -53,6 +52,9 @@ try {
   let taskComment = null,
     parseAsanaURL = null;
 
+  if (!ASANA_PAT){
+    throw({message: "ASANA PAT Not Found!"});
+  }
   if (TASK_COMMENT) {
     taskComment = `${TASK_COMMENT} ${PULL_REQUEST.html_url}`;
   }
