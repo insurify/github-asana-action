@@ -1,0 +1,29 @@
+{
+  "name": "github-asana",
+  "version": "1.0.0",
+  "description": "Action to integrate git with asana",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/insurify/github-actions.git"
+  },
+  "keywords": [
+    "github-actions",
+    "asana",
+    "git"
+  ],
+  "author": "Ali Sajid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/insurify/github-actions/issues"
+  },
+  "homepage": "https://github.com/insurify/github-actions#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.0",
+    "@actions/github": "^1.1.0",
+    "asana": "^0.17.3"
+  }
+}
