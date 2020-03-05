@@ -4,7 +4,7 @@ const asana = require('asana');
 
 async function asanaOperations(
   asanaPAT,
-  projectId,
+  projectName,
   taskId,
   sectionName,
   taskComment
@@ -14,20 +14,24 @@ async function asanaOperations(
       defaultHeaders: { 'asana-enable': 'new-sections,string_ids' },
       logAsanaChangeWarnings: false
     }).useAccessToken(asanaPAT);
-    if (sectionName) {
-      let project = await client.sections.findByProject(projectId);
-      if (project) {
-        let requiredSection = project.find(data => data.name === sectionName);
-        if (requiredSection) {
-          await client.sections.addTask(requiredSection.gid, { task: taskId });
-          core.info('Moved to: ' + requiredSection.name);
+
+    if (sectionName && projectName) {
+      let targetProject = await client.tasks.findById(taskId)
+        .then(task => task.projects.find(project => project.name === projectName));
+      if (targetProject) {
+        let targetSection = await client.sections.findByProject(targetProject.gid)
+          .then(sections => sections.find(section => section.name === sectionName));
+        if (targetSection) {
+          await client.sections.addTask(targetSection.gid, { task: taskId });
+          core.info('Moved to: ' + targetSection.name);
         } else {
           core.error('Asana section ' + sectionName + ' not found.');
         }
       } else {
-        core.error('Asana project with id ' + projectId + ' not found.');
+        core.error(`This task does not exist in "${projectName}" project`);
       }
     }
+
     if (taskComment) {
       await client.tasks.addComment(taskId, {
         text: taskComment
@@ -41,6 +45,7 @@ async function asanaOperations(
 
 try {
   const ASANA_PAT = core.getInput('asana-pat'),
+    PROJECT_NAME = core.getInput('target-project'),
     SECTION_NAME = core.getInput('target-section'),
     TRIGGER_PHRASE = core.getInput('trigger-phrase'),
     TASK_COMMENT = core.getInput('task-comment'),
@@ -53,16 +58,15 @@ try {
     parseAsanaURL = null;
 
   if (!ASANA_PAT){
-    throw({message: "ASANA PAT Not Found!"});
+    throw({message: 'ASANA PAT Not Found!'});
   }
   if (TASK_COMMENT) {
     taskComment = `${TASK_COMMENT} ${PULL_REQUEST.html_url}`;
   }
   while ((parseAsanaURL = REGEX.exec(PULL_REQUEST.body)) !== null) {
-    let projectId = parseAsanaURL.groups.project,
-      taskId = parseAsanaURL.groups.task;
-    if (projectId && taskId) {
-      asanaOperations(ASANA_PAT, projectId, taskId, SECTION_NAME, taskComment);
+    let taskId = parseAsanaURL.groups.task;
+    if (taskId) {
+      asanaOperations(ASANA_PAT, PROJECT_NAME, taskId, SECTION_NAME, taskComment);
     } else {
       core.info('Invalid Asana task URL after the trigger phrase' + TRIGGER_PHRASE);
     }

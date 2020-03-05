@@ -22,9 +22,13 @@ This action integrates asana with github.
 
 **Optional** If any comment is provided, the action will add a comment to the specified asana task with the text & pull request link.
 
+### `target-project`
+
+**Optional** Move task only if it exists in provided project i.e `Current Sprint`.
+
 ### `target-section`
 
-**Optional** Add/Move the task to the provided section i.e `merged`, `review`.
+**Optional** Add/Move the task to the provided section if provided section exists in `target-project` i.e `merged`, `review`.
 
 
 ## Example usage
@@ -33,6 +37,7 @@ This action integrates asana with github.
 uses: https://github.com/insurify/github-actions@master
 with:
   asana-pat: 'Your PAT'
+  target-project: 'Current Sprint'
   target-section: 'In Review'
   task-comment: 'View Pull Request Here: '
   trigger-phrase: 'Asana Task:'
