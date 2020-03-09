@@ -22,23 +22,22 @@ This action integrates asana with github.
 
 **Optional** If any comment is provided, the action will add a comment to the specified asana task with the text & pull request link.
 
-### `target-project`
+### `targets`
 
-**Optional** Move task only if it exists in provided project i.e `Current Sprint`.
-
-### `target-section`
-
-**Optional** Add/Move the task to the provided section if provided section exists in `target-project` i.e `merged`, `review`.
+**Optional** JSON array of objects having project and section where to move current task. Move task only if it exists in target project. e.g 
+```yaml
+targets: '[{"project": "Backlog", "section": "Development Done"}, {"project": "Current Sprint", "section": "In Review"}]'
+```
+if you don't want to move task omit `targets`.
 
 
 ## Example usage
 
 ```yaml
-uses: https://github.com/insurify/github-actions@master
+uses: https://github.com/insurify/github-actions@v2.0.0
 with:
   asana-pat: 'Your PAT'
-  target-project: 'Current Sprint'
-  target-section: 'In Review'
   task-comment: 'View Pull Request Here: '
   trigger-phrase: 'Asana Task:'
+  targets: '[{"project": "Backlog", "section": "Development Done"}, {"project": "Current Sprint", "section": "In Review"}]'
 ```

@@ -4,9 +4,8 @@ const asana = require('asana');
 
 async function asanaOperations(
   asanaPAT,
-  projectName,
+  targets,
   taskId,
-  sectionName,
   taskComment
 ) {
   try {
@@ -15,22 +14,23 @@ async function asanaOperations(
       logAsanaChangeWarnings: false
     }).useAccessToken(asanaPAT);
 
-    if (sectionName && projectName) {
-      let targetProject = await client.tasks.findById(taskId)
-        .then(task => task.projects.find(project => project.name === projectName));
+    const task = await client.tasks.findById(taskId);
+    
+    targets.forEach(async target => {
+      let targetProject = task.projects.find(project => project.name === target.project);
       if (targetProject) {
         let targetSection = await client.sections.findByProject(targetProject.gid)
-          .then(sections => sections.find(section => section.name === sectionName));
+          .then(sections => sections.find(section => section.name === target.section));
         if (targetSection) {
           await client.sections.addTask(targetSection.gid, { task: taskId });
-          core.info('Moved to: ' + targetSection.name);
+          core.info(`Moved to: ${target.project}/${target.section}`);
         } else {
-          core.error('Asana section ' + sectionName + ' not found.');
+          core.error(`Asana section ${target.section} not found.`);
         }
       } else {
-        core.error(`This task does not exist in "${projectName}" project`);
+        core.info(`This task does not exist in "${target.project}" project`);
       }
-    }
+    });
 
     if (taskComment) {
       await client.tasks.addComment(taskId, {
@@ -45,8 +45,7 @@ async function asanaOperations(
 
 try {
   const ASANA_PAT = core.getInput('asana-pat'),
-    PROJECT_NAME = core.getInput('target-project'),
-    SECTION_NAME = core.getInput('target-section'),
+    TARGETS = core.getInput('targets'),
     TRIGGER_PHRASE = core.getInput('trigger-phrase'),
     TASK_COMMENT = core.getInput('task-comment'),
     PULL_REQUEST = github.context.payload.pull_request,
@@ -55,6 +54,7 @@ try {
       'g'
     );
   let taskComment = null,
+    targets = TARGETS? JSON.parse(TARGETS) : [],
     parseAsanaURL = null;
 
   if (!ASANA_PAT){
@@ -66,9 +66,9 @@ try {
   while ((parseAsanaURL = REGEX.exec(PULL_REQUEST.body)) !== null) {
     let taskId = parseAsanaURL.groups.task;
     if (taskId) {
-      asanaOperations(ASANA_PAT, PROJECT_NAME, taskId, SECTION_NAME, taskComment);
+      asanaOperations(ASANA_PAT, targets, taskId, taskComment);
     } else {
-      core.info('Invalid Asana task URL after the trigger phrase' + TRIGGER_PHRASE);
+      core.info(`Invalid Asana task URL after the trigger phrase ${TRIGGER_PHRASE}`);
     }
   }
 } catch (error) {

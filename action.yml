@@ -7,11 +7,8 @@ inputs:
   task-comment:
     description: 'Provide text, which will add a comment with the pull request link to the asana task.'
     required: false
-  target-project:
-    description: 'Name of a project in which you want to move task from one section(column) to another(target-section).'
-    required: false
-  target-section:
-    description: 'Name of a section(column) of target-project where you want to move the task.'
+  targets:
+    description: 'JSON array of objects having project and section where to move current task. Move task only if it exists in target project.'
     required: false
   trigger-phrase:
     description: 'Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3'
