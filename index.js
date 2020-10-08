@@ -48,6 +48,7 @@ try {
     TARGETS = core.getInput('targets'),
     TRIGGER_PHRASE = core.getInput('trigger-phrase'),
     TASK_COMMENT = core.getInput('task-comment'),
+    INCLUDE_REVIEW_STATUS = core.getInput('include-review-status'),
     PULL_REQUEST = github.context.payload.pull_request,
     REGEX = new RegExp(
       `\\*\\*${TRIGGER_PHRASE}\\*\\* \\[(.*?)\\]\\(https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?\\)`,
@@ -61,7 +62,9 @@ try {
     throw({message: 'ASANA PAT Not Found!'});
   }
   if (TASK_COMMENT) {
-    taskComment = `${TASK_COMMENT} ${PULL_REQUEST.html_url}`;
+    taskComment = TASK_COMMENT;
+    if (INCLUDE_REVIEW_STATUS) taskComment += ` ${gitub.event.review.status}`;
+    taskComment += ` ${PULL_REQUEST.html_url}`;
   }
   while ((parseAsanaURL = REGEX.exec(PULL_REQUEST.body)) !== null) {
     let taskId = parseAsanaURL.groups.task;
