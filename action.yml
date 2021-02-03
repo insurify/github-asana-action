@@ -7,6 +7,9 @@ inputs:
   task-comment:
     description: 'Provide text, which will add a comment with the pull request link to the asana task.'
     required: false
+  include-review-status:
+    description: 'When set to "true", the review status will be included in the comment posted to asana. Useful when using pull_request_review as a trigger.'
+    required: false
   targets:
     description: 'JSON array of objects having project and section where to move current task. Move task only if it exists in target project.'
     required: false
