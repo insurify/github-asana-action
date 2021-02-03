@@ -48,7 +48,7 @@ try {
     TARGETS = core.getInput('targets'),
     TRIGGER_PHRASE = core.getInput('trigger-phrase'),
     TASK_COMMENT = core.getInput('task-comment'),
-    INCLUDE_REVIEW_STATUS = core.getInput('include-review-status'),
+    INCLUDE_REVIEW_STATUS = core.getInput('include-review-status') === "true",
     PULL_REQUEST = github.context.payload.pull_request,
     REGEX = new RegExp(
       `\\*\\*${TRIGGER_PHRASE}\\*\\* \\[(.*?)\\]\\(https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?\\)`,
