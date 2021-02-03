@@ -63,7 +63,7 @@ try {
   }
   if (TASK_COMMENT) {
     taskComment = TASK_COMMENT;
-    if (INCLUDE_REVIEW_STATUS) taskComment += ` ${gitub.event.review.status}`;
+    if (INCLUDE_REVIEW_STATUS) taskComment += ` ${github.event.review.status}`;
     taskComment += ` ${PULL_REQUEST.html_url}`;
   }
   while ((parseAsanaURL = REGEX.exec(PULL_REQUEST.body)) !== null) {
