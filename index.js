@@ -59,8 +59,9 @@ try {
     TRIGGER_PHRASE = core.getInput('trigger-phrase'),
     TASK_COMMENT = core.getInput('task-comment'),
     PULL_REQUEST = github.context.payload.pull_request,
+
     REGEX = new RegExp(
-      `${TRIGGER_PHRASE} *\\[(.*?)\\]\\(https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?\\)`,
+      `${TRIGGER_PHRASE} *(\[(.*?)\]\()?https:\/\/app.asana.com\/(\d+)\/(?<project>\d+)\/(?<task>\d+).*?\)?`,
       'g'
     );
   let taskComment = null,
