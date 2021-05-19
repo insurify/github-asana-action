@@ -38,8 +38,10 @@ async function asanaOperations(
     });
 
     if (taskComment) {
-      const shouldSend = !(await commentAlreadySent(client, taskId, taskComment));
-      if (shouldSend) {
+      const shouldSkip = await commentAlreadySent(client, taskId, taskComment);
+      if (shouldSkip) {
+        core.info('Pull request link was already added.')
+      } else {
         await client.tasks.addComment(taskId, {
           text: taskComment
         });
