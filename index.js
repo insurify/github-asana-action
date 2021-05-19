@@ -2,6 +2,11 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const asana = require('asana');
 
+async function commentAlreadySent(client, taskId, taskComment) {
+  const stories = await client.tasks.stories(taskId);
+  return stories.data.some(s => s.type === 'comment' && s.text === taskComment);
+}
+
 async function asanaOperations(
   asanaPAT,
   targets,
@@ -15,7 +20,7 @@ async function asanaOperations(
     }).useAccessToken(asanaPAT);
 
     const task = await client.tasks.findById(taskId);
-    
+
     targets.forEach(async target => {
       let targetProject = task.projects.find(project => project.name === target.project);
       if (targetProject) {
@@ -33,10 +38,13 @@ async function asanaOperations(
     });
 
     if (taskComment) {
-      await client.tasks.addComment(taskId, {
-        text: taskComment
-      });
-      core.info('Added the pull request link to the Asana task.');
+      const shouldSend = !(await commentAlreadySent(client, taskId, taskComment));
+      if (shouldSend) {
+        await client.tasks.addComment(taskId, {
+          text: taskComment
+        });
+        core.info('Added the pull request link to the Asana task.');
+      }
     }
   } catch (ex) {
     console.error(ex.value);
