@@ -40,7 +40,7 @@ if you don't want to move task omit `targets`.
 #### Without special characters:
 
 ```yaml
-uses: insurify/github-asana-action@v1.0.5
+uses: insurify/github-asana-action@v1.0.6
 with:
   asana-pat: 'Your PAT'
   task-comment: 'View Pull Request Here: '
@@ -51,7 +51,7 @@ with:
 #### With special characters:
 
 ```yaml
-uses: insurify/github-asana-action@v1.0.5
+uses: insurify/github-asana-action@v1.0.6
 with:
   asana-pat: 'Your PAT'
   task-comment: 'View Pull Request Here: '
