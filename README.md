@@ -34,7 +34,7 @@ if you don't want to move task omit `targets`.
 ## Example usage
 
 ```yaml
-uses: https://github.com/insurify/github-actions@v2.0.0
+uses: https://github.com/insurify/github-actions@v2.0.1
 with:
   asana-pat: 'Your PAT'
   task-comment: 'View Pull Request Here: '
