@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const asana = require('asana');
+const Asana = require('asana');
 
 async function asanaOperations(
   asanaPAT,
@@ -9,20 +9,22 @@ async function asanaOperations(
   taskComment
 ) {
   try {
-    const client = asana.Client.create({
-      defaultHeaders: { 'asana-enable': 'new-sections,string_ids' },
-      logAsanaChangeWarnings: false
-    }).useAccessToken(asanaPAT);
+    let client = Asana.ApiClient.instance;
+    let token = client.authentications['token'];
+    token.accessToken = asanaPAT;
+    let tasksApiInstance = new Asana.TasksApi();
+    let sectionsApiInstance = new Asana.SectionsApi();
+    let storiesApiInstance = new Asana.StoriesApi();
 
-    const task = await client.tasks.findById(taskId);
-    
+    const task = await tasksApiInstance.getTask(taskId);
+
     targets.forEach(async target => {
-      let targetProject = task.projects.find(project => project.name === target.project);
+      let targetProject = task.data.projects.find(project => project.name === target.project);
       if (targetProject) {
-        let targetSection = await client.sections.findByProject(targetProject.gid)
-          .then(sections => sections.find(section => section.name === target.section));
+        let targetSection = await sectionsApiInstance.getSectionsForProject(targetProject.gid)
+          .then(sections => sections.data.find(section => section.name === target.section));
         if (targetSection) {
-          await client.sections.addTask(targetSection.gid, { task: taskId });
+          await sectionsApiInstance.addTaskForSection(targetSection.gid, { body: { data: { task: taskId } } });
           core.info(`Moved to: ${target.project}/${target.section}`);
         } else {
           core.error(`Asana section ${target.section} not found.`);
@@ -33,9 +35,7 @@ async function asanaOperations(
     });
 
     if (taskComment) {
-      await client.tasks.addComment(taskId, {
-        text: taskComment
-      });
+      await storiesApiInstance.createStoryForTask({ data: { text: taskComment } }, taskId)
       core.info('Added the pull request link to the Asana task.');
     }
   } catch (ex) {
