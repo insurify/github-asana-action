@@ -16,7 +16,7 @@ This action integrates asana with github.
 
 ### `trigger-phrase`
 
-**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/. For special characters in the trigger phrase refer to the examples.
+**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/project/3/task/4/. For special characters in the trigger phrase refer to the examples.
 
 ### `task-comment`
 
@@ -32,7 +32,7 @@ if you don't want to move task omit `targets`.
 
 ## Sample PR Description
 ``
-**Asana Task:** [Task Name](https://app.asana.com/0/1/2)
+**Asana Task:** [Task Name](https://app.asana.com/0/1/project/2/task/3)
 ``
 
 ## Examples
@@ -40,7 +40,7 @@ if you don't want to move task omit `targets`.
 #### Without special characters:
 
 ```yaml
-uses: insurify/github-asana-action@v1.0.6
+uses: insurify/github-asana-action@v1.0.9
 with:
   asana-pat: 'Your PAT'
   task-comment: 'View Pull Request Here: '
@@ -51,7 +51,7 @@ with:
 #### With special characters:
 
 ```yaml
-uses: insurify/github-asana-action@v1.0.6
+uses: insurify/github-asana-action@v1.0.9
 with:
   asana-pat: 'Your PAT'
   task-comment: 'View Pull Request Here: '
