@@ -16,7 +16,7 @@ This action integrates asana with github.
 
 ### `trigger-phrase`
 
-**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
+**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/project/3/task/4/.
 
 ### `task-comment`
 
@@ -34,7 +34,7 @@ if you don't want to move task omit `targets`.
 ## Example usage
 
 ```yaml
-uses: https://github.com/insurify/github-actions@v2.0.1
+uses: https://github.com/insurify/github-actions@v2.0.4
 with:
   asana-pat: 'Your PAT'
   task-comment: 'View Pull Request Here: '
