@@ -50,7 +50,7 @@ try {
     TASK_COMMENT = core.getInput('task-comment'),
     PULL_REQUEST = github.context.payload.pull_request,
     REGEX = new RegExp(
-      `${TRIGGER_PHRASE} *\\[(.*?)\\]\\(https:\\/\\/app.asana.com\\/(\\d+)\\/(?<workspace>\\d+)\\/project\\/(?<project>\\d+)\\/task\\/(?<task>\\d+).*?\\)`,
+      `${TRIGGER_PHRASE} *\\[(.*?)\\]\\(https:\\/\\/app.asana.com\\/(?<urlVersion>\\d+)\\/(?<firstId>\\d+)\\/(project\\/)?(?<secondId>\\d+)(\\/task\\/)?(?<thirdId>\\d+)?.*?\\)`,
       'g'
     );
   let taskComment = null,
@@ -63,12 +63,16 @@ try {
   if (TASK_COMMENT) {
     taskComment = `${TASK_COMMENT} ${PULL_REQUEST.html_url}`;
   }
-  while ((parseAsanaURL = REGEX.exec(PULL_REQUEST.body)) !== null) {
-    let taskId = parseAsanaURL.groups.task;
-    if (taskId) {
-      asanaOperations(ASANA_PAT, targets, taskId, taskComment);
-    } else {
-      core.info(`Invalid Asana task URL after the trigger phrase ${TRIGGER_PHRASE}`);
+  while ((parseAsanaURL = REGEX.exec(testBody)) !== null) {
+    let { urlVersion, secondId, thirdId } = parseAsanaURL.groups;
+    let taskId = null;
+    if (urlVersion) {
+      taskId = urlVersion === "0" ? secondId : thirdId;
+      if (taskId) {
+        asanaOperations(ASANA_PAT, targets, taskId, taskComment);
+      } else {
+        core.info(`Invalid Asana task URL after the trigger phrase ${TRIGGER_PHRASE}`);
+      }
     }
   }
 } catch (error) {
