@@ -63,7 +63,7 @@ try {
   if (TASK_COMMENT) {
     taskComment = `${TASK_COMMENT} ${PULL_REQUEST.html_url}`;
   }
-  while ((parseAsanaURL = REGEX.exec(testBody)) !== null) {
+  while ((parseAsanaURL = REGEX.exec(PULL_REQUEST.body)) !== null) {
     let { urlVersion, secondId, thirdId } = parseAsanaURL.groups;
     let taskId = null;
     if (urlVersion) {
