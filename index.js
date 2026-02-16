@@ -84,9 +84,9 @@ async function asanaOperations(asanaPAT, targets, taskId, taskComment) {
     const prBody = (PULL_REQUEST.body || '').replace(/\*\*/g, '');
     const taskComment = TASK_COMMENT ? `${TASK_COMMENT} ${PULL_REQUEST.html_url}` : null;
 
-    const escapedPhrase = TRIGGER_PHRASE.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+    const escapedPhrase = TRIGGER_PHRASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const REGEX = new RegExp(
-      `${escapedPhrase}\\s*(?:\\*\\*)?\\s*\\[(.*?)\\]\\(https:\\/\\/app\\.asana\\.com\\/(?<urlVersion>\\d+)\\/(?<firstId>\\d+)\\/(?:project\\/)?(?<secondId>\\d+)(?:\\/task\\/)?(?<thirdId>\\d+)?[^)]*\\)`,
+      `${escapedPhrase}\\s*(?:\\*\\*)?\\s*\\[(.*?)\\]\\(https:\\/\\/app\\.asana\\.com\\/(?<urlVersion>\\d+)\\/(?<firstId>\\d+)\\/(?:(?:project\\/)?(?<secondId>\\d+)\\/)?(?:task\\/)?(?<thirdId>\\d+)?[^)]*\\)`,
       'gi'
     );
 
@@ -99,8 +99,8 @@ async function asanaOperations(asanaPAT, targets, taskId, taskComment) {
     const ops = [];
     let match;
     while ((match = REGEX.exec(prBody)) !== null) {
-      const { urlVersion, secondId, thirdId } = match.groups || {};
-      const taskId = urlVersion === '0' ? secondId : thirdId;
+      const { secondId, thirdId } = match.groups || {};
+      const taskId = thirdId || secondId;
       if (taskId) {
         console.log(`[asana] enqueue task=${taskId}`);
         ops.push(asanaOperations(ASANA_PAT, TARGETS ? JSON.parse(TARGETS) : [], taskId, taskComment));
