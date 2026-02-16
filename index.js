@@ -84,9 +84,13 @@ async function asanaOperations(asanaPAT, targets, taskId, taskComment) {
     const prBody = (PULL_REQUEST.body || '').replace(/\*\*/g, '');
     const taskComment = TASK_COMMENT ? `${TASK_COMMENT} ${PULL_REQUEST.html_url}` : null;
 
-    const escapedPhrase = TRIGGER_PHRASE.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+    const escapedPhrase = TRIGGER_PHRASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // URL patterns: (1) New Asana format: /1/WORKSPACE_ID/task/TASK_ID (no project segment)
+    //              (2) Legacy: /1/WORKSPACE_ID/project/PROJECT_ID/task/TASK_ID
+    //              (3) Short: /0/0/TASK_ID or /0/PROJECT_ID/TASK_ID
+    // Link text: [\s\S]*? allows multi-line; \]\\s*\( allows space before (
     const REGEX = new RegExp(
-      `${escapedPhrase}\\s*(?:\\*\\*)?\\s*\\[(.*?)\\]\\(https:\\/\\/app\\.asana\\.com\\/(?<urlVersion>\\d+)\\/(?<firstId>\\d+)\\/(?:project\\/)?(?<secondId>\\d+)(?:\\/task\\/)?(?<thirdId>\\d+)?[^)]*\\)`,
+      `${escapedPhrase}\\s*(?:\\*\\*)?\\s*\\[([\\s\\S]*?)\\]\\s*\\(https:\\/\\/app\\.asana\\.com\\/(?<urlVersion>\\d+)\\/(?<firstId>\\d+)\\/(?:(?:project\\/(?<secondId>\\d+)\\/)?task\\/(?<thirdId>\\d+)|(?<secondId>\\d+)(?:\\/(?<thirdId>\\d+))?)[^)]*\\)`,
       'gi'
     );
 
@@ -100,7 +104,7 @@ async function asanaOperations(asanaPAT, targets, taskId, taskComment) {
     let match;
     while ((match = REGEX.exec(prBody)) !== null) {
       const { urlVersion, secondId, thirdId } = match.groups || {};
-      const taskId = urlVersion === '0' ? secondId : thirdId;
+      const taskId = urlVersion === '0' ? (thirdId || secondId) : thirdId;
       if (taskId) {
         console.log(`[asana] enqueue task=${taskId}`);
         ops.push(asanaOperations(ASANA_PAT, TARGETS ? JSON.parse(TARGETS) : [], taskId, taskComment));
